@@ -1,0 +1,159 @@
+FileSystem in a File
+====================
+
+Disclaimer: I think this code works correctly, but if you think you
+might have found a bug, let me <m.handley@cs.ucl.ac.uk> know.  
+
+
+Errata:
+------
+
+ - The superblock metadata is not updated as it should be.
+ - The primary superblock is not cloned into the secondary superblocks.
+
+Neither of these should present a problem.
+
+
+Programs
+========
+
+The files in this directory contain the C source code to several
+programs for creating and manipulating a filesystem in a file.
+
+Four programs will be built if you type "make":
+
+  jfs_format: creates a new empty filesystem in a file.
+
+  jfs_mkdir: creates a new directory within a filesystem in a file.
+
+  jfs_ls: lists verbosely all the files and directories in the filesystem.
+
+  jfs_copyin: copies a file from the external filesystem into the
+     virtual one.
+
+  jfs_copyout: copies a file from the virtual filesystem to the
+     external one.
+
+  jfs_fsck: checks the filesystem is internally consistent.
+
+
+"make" will also try to compile jfs_rm that you are supposed to
+write, but as there's no source code for them here, it will currently
+fail.
+
+
+Files
+=====
+
+The files provided are:
+
+Makefile
+	Used by the "make" (or gmake) utility to compile and link all
+	the programs.  On Solaris, gmake works and make doesn't.
+
+fs_disk.h
+	Basic definitions used to emulate a virtual disk within a file.
+fs_disk.c
+	C functions used to emulate a virtual disk within a file.
+	The main functions you will need to use are:
+		mount_disk_image
+		unmount_disk_image
+		read_block
+		write_block
+
+jfs_common.h
+	Basic definitions used in the filesystem, including all the
+	filesystem structures and many constant definitions.
+jfs_common.c
+	C functions that provide core filesystem functionality that is
+	used by many programs.  You may find many functions from this
+	file useful.
+
+jfs_format.c
+	C functions used to build the jfs_format program.
+
+jfs_mkdir.c
+	C functions used to build the jfs_mkdir program.
+
+jfs_ls.c
+	C functions used to build the jfs_ls program.
+
+jfs_copyin.c
+	C functions used to build the jfs_copyin program.
+
+jfs_copyout.c
+	C functions used to build the jfs_copyout program.
+
+jfs_fsck.c
+	C functions used to build the jfs_fsck program.
+
+
+Examples
+========
+
+vulture.xorp.org: ./jfs_format disk
+
+
+vulture.xorp.org: ls -l disk
+-rw-------  1 mjh  mjh  524288 Dec  3 10:07 disk
+
+
+vulture.xorp.org: ./jfs_ls disk
+/.   (directory 40 bytes)
+/..   (directory 40 bytes)
+
+
+vulture.xorp.org: ./jfs_mkdir disk foo
+
+vulture.xorp.org: ./jfs_mkdir disk foo/bar
+
+vulture.xorp.org: ./jfs_mkdir disk blah
+
+
+vulture.xorp.org: ./jfs_ls disk
+/.   (directory 81 bytes)
+/..   (directory 81 bytes)
+/foo   (directory 60 bytes)
+/foo/.   (directory 60 bytes)
+/foo/..   (directory 60 bytes)
+/foo/bar   (directory 40 bytes)
+/foo/bar/.   (directory 40 bytes)
+/foo/bar/..   (directory 40 bytes)
+/blah   (directory 40 bytes)
+/blah/.   (directory 40 bytes)
+/blah/..   (directory 40 bytes)
+
+
+vulture.xorp.org: ./jfs_fsck disk
+Filesystem 'disk' is consistent
+
+vulture.xorp.org: CRASH_AFTER=13;export CRASH_AFTER
+
+vulture.xorp.org: ./jfs_copyin disk README foo/README
+Crashing on demand!
+
+vulture.xorp.org: ./jfs_ls disk
+/.   (directory 108 bytes)
+/..   (directory 108 bytes)
+/.log   7168 bytes
+/foo   (directory 60 bytes)
+/foo/.   (directory 60 bytes)
+/foo/..   (directory 108 bytes)
+/foo/bar   (directory 40 bytes)
+/foo/bar/.   (directory 40 bytes)
+/foo/bar/..   (directory 60 bytes)
+/blah   (directory 40 bytes)
+/blah/.   (directory 40 bytes)
+/blah/..   (directory 108 bytes)
+
+
+vulture.xorp.org: ./jfs_fsck disk
+Inode 5 is not used, but is not listed as being free
+Block 27 is not used, but is not listed as being free
+Block 28 is not used, but is not listed as being free
+Block 29 is not used, but is not listed as being free
+Block 30 is not used, but is not listed as being free
+Block 31 is not used, but is not listed as being free
+Block 32 is not used, but is not listed as being free
+Block 33 is not used, but is not listed as being free
+
