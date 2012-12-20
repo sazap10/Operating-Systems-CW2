@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 	root_inode = find_root_directory(jfs);
 	printf("root inode num: %d\n",root_inode);
 	
-	inode = findfile_recursive(jfs, argv[2], root_inode,DT_DIRECTORY);
+	inode = findfile_recursive(jfs, argv[2], root_inode,DT_FILE);
 	
 	printf("inode num: %d\n",inode);
 	
