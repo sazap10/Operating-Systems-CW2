@@ -16,6 +16,9 @@ int main(int argc, char **argv)
 {
     struct disk_image *di;
     jfs_t *jfs;
+	struct inode i_node;
+	int root_inode;
+    
 
     if (argc != 3) {
 		usage();
@@ -23,6 +26,19 @@ int main(int argc, char **argv)
 
     di = mount_disk_image(argv[1]);
     jfs = init_jfs(di);
+	
+	root_inode = find_root_directory(jfs);
+	
+	get_inode(jfs, root_inode, &i_node);
+	
+	/*dir_size = i_node.size;
+
+    jfs_read_block(jfs, block, i_node.blockptrs[0]);
+
+    dir_entry = (struct dirent*)block;
+	char filename[MAX_FILENAME_LEN + 1];
+	memcpy(filename, dir_entry->name, dir_entry->namelen);
+	filename[dir_entry->namelen] = '\0';*/
 
 	printf("File to remove: %s\n", argv[2]);
 
