@@ -18,6 +18,7 @@ int main(int argc, char **argv)
     jfs_t *jfs;
 	struct inode i_node;
 	int root_inode;
+	int inode;
     
 
     if (argc != 3) {
@@ -28,19 +29,17 @@ int main(int argc, char **argv)
     jfs = init_jfs(di);
 	
 	root_inode = find_root_directory(jfs);
+	printf("root inode num: %d",root_inode);
 	
-	get_inode(jfs, root_inode, &i_node);
+	inode = findfile_recursive(jfs, args[2], root_inode,DT_DIRECTORY);
 	
-	/*dir_size = i_node.size;
+	printf("inode num: %d",inode);
+	
+	//get_inode(jfs, root_inode, &i_node);
 
-    jfs_read_block(jfs, block, i_node.blockptrs[0]);
-
-    dir_entry = (struct dirent*)block;
-	char filename[MAX_FILENAME_LEN + 1];
-	memcpy(filename, dir_entry->name, dir_entry->namelen);
-	filename[dir_entry->namelen] = '\0';*/
 
 	printf("File to remove: %s\n", argv[2]);
+	
 
     unmount_disk_image(di);
 
