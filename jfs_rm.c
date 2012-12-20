@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     di = mount_disk_image(argv[1]);
     jfs = init_jfs(di);
 
-	printf("File to remove: %s", argv[2]);
+	printf("File to remove: %s\n", argv[2]);
 
     unmount_disk_image(di);
 
