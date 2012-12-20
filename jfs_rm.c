@@ -35,12 +35,17 @@ int main(int argc, char **argv)
 	
 	printf("inode num: %d\n",inode);
 	
-	//get_inode(jfs, root_inode, &i_node);
-
+	get_inode(jfs, inode, &i_node);
 
 	printf("File to remove: %s\n", argv[2]);
 	
-
+	printf("Inode: size = %d, flags = %d", i_node.size,i_node.flags);
+	int i =0;
+	while(i_node.blockptrs[i]){
+		printf(" block%d = %d, ",i,i_node.blockptrs[i]);
+		i++;
+	}
+	printf("\n");
     unmount_disk_image(di);
 
     exit(0);
