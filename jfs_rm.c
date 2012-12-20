@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 	printf("Inode: size = %d, flags = %d", i_node.size,i_node.flags);
 	int i =0;
 	while(i_node.blockptrs[i]){
-		printf(" block%d = %d, ",i,i_node.blockptrs[i]);
+		printf(", block%d = %d ",i,i_node.blockptrs[i]);
 		i++;
 	}
 	printf("\n");
