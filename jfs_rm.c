@@ -29,11 +29,11 @@ int main(int argc, char **argv)
     jfs = init_jfs(di);
 	
 	root_inode = find_root_directory(jfs);
-	printf("root inode num: %d",root_inode);
+	printf("root inode num: %d\n",root_inode);
 	
 	inode = findfile_recursive(jfs, argv[2], root_inode,DT_DIRECTORY);
 	
-	printf("inode num: %d",inode);
+	printf("inode num: %d\n",inode);
 	
 	//get_inode(jfs, root_inode, &i_node);
 
