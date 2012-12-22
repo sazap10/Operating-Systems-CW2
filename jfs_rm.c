@@ -42,16 +42,17 @@ int main(int argc, char **argv)
 	printf("File to remove: %s\n", argv[2]);
 	//read first block
 	
+	printf("Inode to block: %d\n",inode_to_block(inode));
 
-	printf("Inode: size = %d, flags = %d", i_node.size,i_node.flags);
+	printf("Inode: size = %d, flags = %d\n", i_node.size,i_node.flags);
 	
 		
 	//return_inode_to_freelist(jfs,inode);
 	int i =0;
 	while(i_node.blockptrs[i]){
-		printf(", block%d = %d ",i,i_node.blockptrs[i]);
+		//printf(", block%d = %d ",i,i_node.blockptrs[i]);
 		jfs_read_block(jfs,block,i_node.blockptrs[i]);
-		printf("%s\n",block);
+		printf("%s",block);
 		//return_block_to_freelist(jfs,i_node.blockptrs[i]);
 		i++;
 	}
