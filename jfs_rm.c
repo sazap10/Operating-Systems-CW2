@@ -33,20 +33,20 @@ int main(int argc, char **argv)
 	root_inode = find_root_directory(jfs);
 	printf("root inode num: %d\n",root_inode);
 	
-	inode = findfile_recursive(jfs, argv[2], root_inode,DT_FILE);
+	//inode = findfile_recursive(jfs, argv[2], root_inode,DT_FILE);
 	
-	printf("inode num: %d\n",inode);
+	//printf("inode num: %d\n",inode);
 	
-	get_inode(jfs, inode, &i_node);
+	get_inode(jfs, root_inode, &i_node);
 
 	printf("File to remove: %s\n", argv[2]);
 	
 	printf("Inode to block: %d\n",inode_to_block(inode));
 	
-	jfs_read_block(jfs, block, inode_to_block(inode));
+	jfs_read_block(jfs, block, i_node.blockptrs[0]);
 	
 	printf("%s\n",block);
-	
+	/*
 	dir_entry = (struct dirent*)block;
 	char filename[MAX_FILENAME_LEN + 1];
 	memcpy(filename, dir_entry->name, dir_entry->namelen);
