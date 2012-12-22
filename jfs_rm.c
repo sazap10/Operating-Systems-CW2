@@ -37,17 +37,12 @@ int main(int argc, char **argv)
 	
 	printf("inode num: %d\n",inode);
 	
-	get_inode(jfs, 0, &i_node);
+	get_inode(jfs, inode, &i_node);
 
 	printf("File to remove: %s\n", argv[2]);
 	//read first block
-	jfs_read_block(jfs,block,0);
-	dir_entry = (struct dirent*)block;
-		//print block
-		char filename[MAX_FILENAME_LEN + 1];
-	memcpy(filename, dir_entry->name, dir_entry->namelen);
-	filename[dir_entry->namelen] = '\0';
-	printf("%s\n name: %s",block,filename);
+	
+
 	printf("Inode: size = %d, flags = %d", i_node.size,i_node.flags);
 	
 		
@@ -55,6 +50,8 @@ int main(int argc, char **argv)
 	int i =0;
 	while(i_node.blockptrs[i]){
 		printf(", block%d = %d ",i,i_node.blockptrs[i]);
+		jfs_read_block(jfs,block,i_node.blockptrs[i]);
+		printf("%s",block);
 		//return_block_to_freelist(jfs,i_node.blockptrs[i]);
 		i++;
 	}
