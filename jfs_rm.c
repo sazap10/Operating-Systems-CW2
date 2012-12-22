@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 	while(i_node.blockptrs[i]){
 		printf(", block%d = %d ",i,i_node.blockptrs[i]);
 		jfs_read_block(jfs,block,i_node.blockptrs[i]);
-		printf("%s",block);
+		printf("%s\n",block);
 		//return_block_to_freelist(jfs,i_node.blockptrs[i]);
 		i++;
 	}
