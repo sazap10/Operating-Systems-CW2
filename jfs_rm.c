@@ -19,6 +19,8 @@ int main(int argc, char **argv)
 	struct inode i_node;
 	int root_inode;
 	int inode;
+    struct dirent* dir_entry;
+    char block[BLOCKSIZE];
     
 
     if (argc != 3) {
@@ -40,11 +42,16 @@ int main(int argc, char **argv)
 	printf("File to remove: %s\n", argv[2]);
 	
 	printf("Inode: size = %d, flags = %d", i_node.size,i_node.flags);
-	return_inode_to_freelist(jfs,inode);
+	//read first block
+	jfs_read_block(jfs,block,i_node.blockptrs[0]);
+	//print block
+	int j = 0;
+		printf("%s",block);
+	//return_inode_to_freelist(jfs,inode);
 	int i =0;
 	while(i_node.blockptrs[i]){
 		printf(", block%d = %d ",i,i_node.blockptrs[i]);
-		return_block_to_freelist(jfs,i_node.blockptrs[i]);
+		//return_block_to_freelist(jfs,i_node.blockptrs[i]);
 		i++;
 	}
 	printf("\n");
