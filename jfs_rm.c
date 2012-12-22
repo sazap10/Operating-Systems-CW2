@@ -21,6 +21,9 @@ int main(int argc, char **argv)
 	int inode;
     struct dirent* dir_entry;
     char block[BLOCKSIZE];
+	char firstpart[MAX_FILENAME_LEN];
+	char lastpart[MAX_FILENAME_LEN];
+	char rest[MAX_FILENAME_LEN];
     
 
     if (argc != 3) {
@@ -32,6 +35,10 @@ int main(int argc, char **argv)
 	
 	root_inode = find_root_directory(jfs);
 	printf("root inode num: %d\n",root_inode);
+	
+	first_part(argv[2],firstpart);
+	last_part(argv[2],lastpart);
+	all_but_last_part(argv[2],rest);
 	
 	//inode = findfile_recursive(jfs, argv[2], root_inode,DT_FILE);
 	
