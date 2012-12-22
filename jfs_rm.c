@@ -44,7 +44,10 @@ int main(int argc, char **argv)
 	jfs_read_block(jfs,block,0);
 	dir_entry = (struct dirent*)block;
 		//print block
-	printf("%s\n name: %s",block,dir_entry->name);
+		char filename[MAX_FILENAME_LEN + 1];
+	memcpy(filename, dir_entry->name, dir_entry->namelen);
+	filename[dir_entry->namelen] = '\0';
+	printf("%s\n name: %s",block,filename);
 	printf("Inode: size = %d, flags = %d", i_node.size,i_node.flags);
 	
 		
