@@ -48,13 +48,19 @@ int main(int argc, char **argv)
 	printf("%s\n",block);
 	
 	dir_entry = (struct dirent*)block;
+	char filename[MAX_FILENAME_LEN + 1];
+	memcpy(filename, dir_entry->name, dir_entry->namelen);
+	filename[dir_entry->namelen] = '\0';
+	
+	printf("dir_entry: file_type=%d entry_len=%d inode=%d namelen=%d name=%s\n",dir_entry->file_type,dir_entry->entry_len,dir_entry->inode,dir_entry->namelen,filename);
 
 	//printf("Inode: size = %d, flags = %d\n", i_node.size,i_node.flags);
 	
 	//set the inode as free	
 	//return_inode_to_freelist(jfs,inode);
-	int i =0;
 	/*used to loop through the blocks of the file
+	int i =0;
+	
 	while(i_node.blockptrs[i]){
 		//printf(", block%d = %d ",i,i_node.blockptrs[i]);
 		jfs_read_block(jfs,block,i_node.blockptrs[i]);
