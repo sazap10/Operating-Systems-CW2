@@ -40,22 +40,29 @@ int main(int argc, char **argv)
 	get_inode(jfs, inode, &i_node);
 
 	printf("File to remove: %s\n", argv[2]);
-	//read first block
 	
 	printf("Inode to block: %d\n",inode_to_block(inode));
-
-	printf("Inode: size = %d, flags = %d\n", i_node.size,i_node.flags);
 	
-		
+	jfs_read_block(jfs, block, inode_to_block(inode));
+	
+	printf("%s\n",block);
+	
+	dir_entry = (struct dirent*)block;
+
+	//printf("Inode: size = %d, flags = %d\n", i_node.size,i_node.flags);
+	
+	//set the inode as free	
 	//return_inode_to_freelist(jfs,inode);
 	int i =0;
+	/*used to loop through the blocks of the file
 	while(i_node.blockptrs[i]){
 		//printf(", block%d = %d ",i,i_node.blockptrs[i]);
 		jfs_read_block(jfs,block,i_node.blockptrs[i]);
 		printf("%s",block);
+		//set block as free
 		//return_block_to_freelist(jfs,i_node.blockptrs[i]);
 		i++;
-	}
+	}*/
 	printf("\n");
     unmount_disk_image(di);
 
