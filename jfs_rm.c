@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 	
 	printf("inode num: %d\n",inode);
 	
-	get_inode(jfs, inode, &i_node);
+	get_inode(jfs, 0, &i_node);
 
 	printf("File to remove: %s\n", argv[2]);
 	
