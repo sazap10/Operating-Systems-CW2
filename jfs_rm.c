@@ -40,13 +40,14 @@ int main(int argc, char **argv)
 	get_inode(jfs, 0, &i_node);
 
 	printf("File to remove: %s\n", argv[2]);
-	
-	printf("Inode: size = %d, flags = %d", i_node.size,i_node.flags);
 	//read first block
 	jfs_read_block(jfs,block,i_node.blockptrs[0]);
-	//print block
+		//print block
+	printf("%s\n",block);
+	printf("Inode: size = %d, flags = %d", i_node.size,i_node.flags);
+	
 	int j = 0;
-		printf("%s",block);
+		
 	//return_inode_to_freelist(jfs,inode);
 	int i =0;
 	while(i_node.blockptrs[i]){
