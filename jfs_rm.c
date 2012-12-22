@@ -40,6 +40,11 @@ int main(int argc, char **argv)
 	last_part(argv[2],lastpart);
 	all_but_last_part(argv[2],rest);
 	
+	printf("%s\n",firstpart);
+	printf("%s\n",lastpart);
+	printf("%s\n",rest);
+	
+	
 	//inode = findfile_recursive(jfs, argv[2], root_inode,DT_FILE);
 	
 	//printf("inode num: %d\n",inode);
