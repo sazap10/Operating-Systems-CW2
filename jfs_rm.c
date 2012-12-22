@@ -42,8 +42,9 @@ int main(int argc, char **argv)
 	printf("File to remove: %s\n", argv[2]);
 	//read first block
 	jfs_read_block(jfs,block,0);
+	dir_entry = (struct dirent*)block;
 		//print block
-	printf("%s\n",block);
+	printf("%s\n name: %s",block,dir_entry->name);
 	printf("Inode: size = %d, flags = %d", i_node.size,i_node.flags);
 	
 		
