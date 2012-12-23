@@ -59,10 +59,10 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	
 	dir_entry = (struct dirent*)block;
 	
-	char filename[MAX_FILENAME_LEN + 1];
-	memcpy(filename, dir_entry->name, dir_entry->namelen);
-	filename[dir_entry->namelen] = '\0';
-	printf("%s\n",filename);
+	char file_name[MAX_FILENAME_LEN + 1];
+	memcpy(file_name, dir_entry->name, dir_entry->namelen);
+	file_name[dir_entry->namelen] = '\0';
+	printf("%s\n",file_name);
 	//printf("dir_entry: file_type=%d entry_len=%d inode=%d namelen=%d name=%s\n",dir_entry->file_type,dir_entry->entry_len,dir_entry->inode,dir_entry->namelen,filename);
 
 	//printf("Inode: size = %d, flags = %d\n", i_node.size,i_node.flags);
