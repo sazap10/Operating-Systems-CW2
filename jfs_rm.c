@@ -36,8 +36,8 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	printf("%s\n",lastpart);
 	printf("%s\n",rest);
 	*/
-	
-	if(file_inode = findfile_recursive(jfs, filename, root_inode,DT_FILE)==-1){
+	file_inode = findfile_recursive(jfs, filename, root_inode,DT_FILE)
+	if(file_inode==-1){
 		printf("rm: cannot remove '%s': No such file\n",filename);
 		return;
 	}
