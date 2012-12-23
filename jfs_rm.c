@@ -12,30 +12,21 @@ void usage()
     exit(1);
 }
 
-int main(int argc, char **argv)
-{
-    struct disk_image *di;
-    jfs_t *jfs;
-	struct inode i_node;
+void jfs_remove_file(jfs_t *jfs,char *filename){
+	struct inode file_i_node;
+	struct inode dir_i_node;
 	int root_inode;
-	int inode;
+	int file_inode;
+	int dir_inode;
     struct dirent* dir_entry;
     char block[BLOCKSIZE];
-	char firstpart[MAX_FILENAME_LEN];
-	char lastpart[MAX_FILENAME_LEN];
 	char rest[MAX_FILENAME_LEN];
-    
-
-    if (argc != 3) {
-		usage();
-    }
-
-    di = mount_disk_image(argv[1]);
-    jfs = init_jfs(di);
 	
 	root_inode = find_root_directory(jfs);
 	printf("root inode num: %d\n",root_inode);
 	
+	all_but_last_part(filename,rest);
+	/*
 	first_part(argv[2],firstpart);
 	last_part(argv[2],lastpart);
 	all_but_last_part(argv[2],rest);
@@ -43,19 +34,21 @@ int main(int argc, char **argv)
 	printf("%s\n",firstpart);
 	printf("%s\n",lastpart);
 	printf("%s\n",rest);
+	*/
 	
-	
-	//inode = findfile_recursive(jfs, argv[2], root_inode,DT_FILE);
-	
+	if(file_inode = findfile_recursive(jfs, filename, root_inode,DT_FILE)==-1){
+		printf("rm: cannot remove '%s': No such file or directory",filename);
+		return;
+	}
 	//printf("inode num: %d\n",inode);
 	
-	get_inode(jfs, root_inode, &i_node);
+	get_inode(jfs, file_inode, &file_i_node);
+	
+	get_inode(jfs,dir_inode,&dir_i_node);
 
-	printf("File to remove: %s\n", argv[2]);
+	printf("File to remove: %s\n", filename);
 	
-	printf("Inode to block: %d\n",inode_to_block(inode));
-	
-	jfs_read_block(jfs, block, i_node.blockptrs[0]);
+	jfs_read_block(jfs, block, dir_inode.blockptrs[0]);
 	
 	printf("%s\n",block);
 	/*
@@ -82,6 +75,22 @@ int main(int argc, char **argv)
 		i++;
 	}*/
 	printf("\n");
+}
+
+int main(int argc, char **argv)
+{
+    struct disk_image *di;
+    jfs_t *jfs;
+    
+    if (argc != 3) {
+		usage();
+    }
+
+    di = mount_disk_image(argv[1]);
+    jfs = init_jfs(di);
+	
+	jfs_remove_file(jfs,argv[2]);
+	
     unmount_disk_image(di);
 
     exit(0);
