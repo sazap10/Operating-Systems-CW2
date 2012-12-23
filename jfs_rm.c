@@ -21,12 +21,15 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	int dir_inode;
     struct dirent* dir_entry;
     char block[BLOCKSIZE];
+	char just_filename[MAX_FILENAME_LEN];
 	char rest[MAX_FILENAME_LEN];
+	int dir_size, bytes_done=0;
 	
 	root_inode = find_root_directory(jfs);
 	printf("root inode num: %d\n",root_inode);
 	
 	all_but_last_part(filename,rest);
+	last_part(filename,just_filename);
 	/*
 	first_part(argv[2],firstpart);
 	last_part(argv[2],lastpart);
@@ -48,21 +51,31 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	get_inode(jfs, file_inode, &file_i_node);
 	
 	get_inode(jfs,dir_inode,&dir_i_node);
-	
-	get_inode(jfs,root_inode,&root_i_node);
+	dir_size = dir_i_node.size;
 
 	printf("File to remove: %s\n", filename);
 	
 	jfs_read_block(jfs, block, dir_i_node.blockptrs[0]);
 	
-	printf("%s\n",block);
-	
 	dir_entry = (struct dirent*)block;
-	
-	char file_name[MAX_FILENAME_LEN + 1];
-	memcpy(file_name, dir_entry->name, dir_entry->namelen);
-	file_name[dir_entry->namelen] = '\0';
-	printf("%s\n",file_name);
+	while(1){
+		char file_name[MAX_FILENAME_LEN + 1];
+		memcpy(file_name, dir_entry->name, dir_entry->namelen);
+		file_name[dir_entry->namelen] = '\0';
+		printf("%s\n",file_name);
+		if(!strcmp(file_name,just_filename)){
+			printf("file found");
+			break;
+			//remove it
+		}else{
+			bytes_done += dir_entry->entry_len;
+			dir_entry = (struct dirent*)(block + bytes_done);
+
+			if (bytes_done >= dir_size) {
+				break;
+			}
+		}
+	}
 	//printf("dir_entry: file_type=%d entry_len=%d inode=%d namelen=%d name=%s\n",dir_entry->file_type,dir_entry->entry_len,dir_entry->inode,dir_entry->namelen,filename);
 
 	//printf("Inode: size = %d, flags = %d\n", i_node.size,i_node.flags);
