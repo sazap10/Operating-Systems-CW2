@@ -38,11 +38,12 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	*/
 	
 	if(file_inode = findfile_recursive(jfs, filename, root_inode,DT_FILE)==-1){
-		printf("rm: cannot remove '%s': No such file or directory",filename);
+		printf("rm: cannot remove '%s': No such file\n",filename);
 		return;
 	}
 	//printf("inode num: %d\n",inode);
 	dir_inode = findfile_recursive(jfs,rest,root_inode,DT_DIRECTORY);
+	printf("dir inode num: %d\n",dir_inode);
 	
 	get_inode(jfs, file_inode, &file_i_node);
 	
