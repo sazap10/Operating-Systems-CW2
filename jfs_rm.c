@@ -58,7 +58,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	printf("%s\n",block);
 	
 	dir_entry = (struct dirent*)block;
-	/*
+	
 	char filename[MAX_FILENAME_LEN + 1];
 	memcpy(filename, dir_entry->name, dir_entry->namelen);
 	filename[dir_entry->namelen] = '\0';
