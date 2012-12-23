@@ -76,9 +76,6 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 			}
 		}
 	}
-	//printf("dir_entry: file_type=%d entry_len=%d inode=%d namelen=%d name=%s\n",dir_entry->file_type,dir_entry->entry_len,dir_entry->inode,dir_entry->namelen,filename);
-
-	//printf("Inode: size = %d, flags = %d\n", i_node.size,i_node.flags);
 	
 	//set the inode as free	
 	//return_inode_to_freelist(jfs,inode);
