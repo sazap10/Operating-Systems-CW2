@@ -15,6 +15,7 @@ void usage()
 void jfs_remove_file(jfs_t *jfs,char *filename){
 	struct inode file_i_node;
 	struct inode dir_i_node;
+	struct inode root_i_node;
 	int root_inode;
 	int file_inode;
 	int dir_inode;
@@ -41,14 +42,17 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 		return;
 	}
 	//printf("inode num: %d\n",inode);
+	dir_inode = findfile_recursive(jfs,rest,root_inode,DT_DIRECTORY);
 	
 	get_inode(jfs, file_inode, &file_i_node);
 	
 	get_inode(jfs,dir_inode,&dir_i_node);
+	
+	get_inode(jfs,root_inode,&root_i_node);
 
 	printf("File to remove: %s\n", filename);
 	
-	jfs_read_block(jfs, block, dir_i_node.blockptrs[0]);
+	jfs_read_block(jfs, block, root_i_node.blockptrs[0]);
 	
 	printf("%s\n",block);
 	/*
