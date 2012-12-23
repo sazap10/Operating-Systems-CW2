@@ -53,7 +53,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 
 	printf("File to remove: %s\n", filename);
 	
-	jfs_read_block(jfs, block, file_i_node.blockptrs[0]);
+	jfs_read_block(jfs, block, dir_i_node.blockptrs[0]);
 	
 	printf("%s\n",block);
 	/*
