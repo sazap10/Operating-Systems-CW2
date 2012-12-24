@@ -38,14 +38,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 		exit(1);
 	}
 	//printf("inode num: %d\n",inode);
-	return_inode_to_freelist(jfs,file_inode);
-			int i =0;
 	
-			while(file_i_node.blockptrs[i]){
-				//set block as free
-				return_block_to_freelist(jfs,file_i_node.blockptrs[i]);
-				i++;
-			}
 	
 	dir_inode = findfile_recursive(jfs,rest,root_inode,DT_DIRECTORY);
 	printf("dir inode num: %d\n",dir_inode);
@@ -79,7 +72,14 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 			dir_i_node.size -=dir_entry->entry_len;
 			jfs_write_block(jfs,updatedblock,dir_i_node.blockptrs[0]);
 			//set the inode as free	
-			
+			return_inode_to_freelist(jfs,file_inode);
+			int i =0;
+	
+			while(file_i_node.blockptrs[i]){
+				//set block as free
+				return_block_to_freelist(jfs,file_i_node.blockptrs[i]);
+				i++;
+			}
 			jfs_commit(jfs);
 			break;
 			//remove it
