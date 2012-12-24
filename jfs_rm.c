@@ -14,34 +14,14 @@ void usage()
 
  
 /* Change the size of the specified inode to a new size */
-void update_inode_size(jfs_t *jfs, int inode_num, unsigned int new_size)
+void change_dir_size(jfs_t *jfs, int dir_inode_num, unsigned int new_size)
 {
     char block[BLOCKSIZE];
-    char updatedblock[BLOCKSIZE];
-    char *newblock;
     struct inode *dir_inode;
-    int inodes_done = 0;
-    jfs_read_block(jfs,block,inode_to_block(inode_num));
-	dir_inode = (struct inode *)(block + (inode_num % INODES_PER_BLOCK)*INODE_SIZE);
+    jfs_read_block(jfs,block,inode_to_block(dir_inode_num));
+	dir_inode = (struct inode *)(block + (dir_inode_num % INODES_PER_BLOCK)*INODE_SIZE);
     dir_inode->size = new_size;
-
-	/*
-    while(1)
-    {
-        dir_inode = (struct inode *)(block + inodes_done*INODE_SIZE);
-        if(inode_num % INODES_PER_BLOCK == inodes_done)
-        {
-            dir_inode->size = new_size;
-        }
-        newblock = (char *)(updatedblock + inodes_done*INODE_SIZE);
-        inodes_done += 1;
-        memcpy(newblock,dir_inode,INODE_SIZE);
-        if(inodes_done == 8)
-        {
-            break;
-        }
-    }*/
-    jfs_write_block(jfs,block,inode_to_block(inode_num));
+    jfs_write_block(jfs,block,inode_to_block(dir_inode_num));
     jfs_commit(jfs);
 }
 
@@ -85,7 +65,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 			memcpy(beforefile,afterfile,(BLOCKSIZE - bytes_plus_entrylen));			
 			jfs_write_block(jfs,new_block,dir_i_node.blockptrs[0]);
 			jfs_commit(jfs);
-            update_inode_size(jfs, dir_inode, dir_size - dir_entry->entry_len);
+            change_dir_size(jfs, dir_inode, dir_size - dir_entry->entry_len);
 			//set the inode as free	
 			return_inode_to_freelist(jfs,file_inode);
 			int i =0;
