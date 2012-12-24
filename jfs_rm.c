@@ -13,18 +13,10 @@ void usage()
 }
 
 void jfs_remove_file(jfs_t *jfs,char *filename){
-	struct inode file_i_node;
-	struct inode dir_i_node;
-	struct inode root_i_node;
-	int root_inode;
-	int file_inode;
-	int dir_inode;
+	struct inode file_i_node,inode dir_i_node;
+	int root_inode,file_inode, dir_inode, dir_size, bytes_done=0;
     struct dirent* dir_entry;
-    char block[BLOCKSIZE];
-	char just_filename[MAX_FILENAME_LEN];
-	char rest[MAX_FILENAME_LEN];
-	char new_block[BLOCKSIZE];
-	int dir_size, bytes_done=0;
+    char block[BLOCKSIZE],just_filename[MAX_FILENAME_LEN], rest[MAX_FILENAME_LEN], new_block[BLOCKSIZE];
 	
 	root_inode = find_root_directory(jfs);
 	printf("root inode num: %d\n",root_inode);
@@ -70,6 +62,17 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 			memcpy(new_block,block,bytes_done);
 			int bytes_plus_entrylen= bytes_done+dir_entry->entry_len;
 			memcpy(new_block,block+bytes_plus_entrylen,dir_size-bytes_plus_entrylen);
+			dir_i_node.size -=dir_entry->entry_len;
+			
+			//set the inode as free	
+			return_inode_to_freelist(jfs,file_inode);
+			int i =0;
+	
+			while(file_i_node.blockptrs[i]){
+				//set block as free
+				return_block_to_freelist(jfs,file_i_node.blockptrs[i]);
+				i++;
+			}
 			break;
 			//remove it
 		}else{
@@ -82,8 +85,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 		}
 	}
 	
-	//set the inode as free	
-	//return_inode_to_freelist(jfs,inode);
+	
 	/*used to loop through the blocks of the file
 	int i =0;
 	
