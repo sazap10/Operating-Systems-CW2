@@ -81,7 +81,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 			beforefile = (char *)(new_block + bytes_done);
 			int bytes_plus_entrylen= bytes_done+dir_entry->entry_len;
 			afterfile = (char *)(block + bytes_plus_entrylen);
-			memcpy(new_block,afterfile,(BLOCKSIZE - bytes_plus_entrylen));			
+			memcpy(beforefile,afterfile,(BLOCKSIZE - bytes_plus_entrylen));			
 			jfs_write_block(jfs,new_block,dir_i_node.blockptrs[0]);
 			jfs_commit(jfs);
             update_inode_size(jfs, dir_inode, dir_size - dir_entry->entry_len);
