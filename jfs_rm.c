@@ -23,6 +23,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
     char block[BLOCKSIZE];
 	char just_filename[MAX_FILENAME_LEN];
 	char rest[MAX_FILENAME_LEN];
+	char new_block[BLOCKSIZE];
 	int dir_size, bytes_done=0;
 	
 	root_inode = find_root_directory(jfs);
@@ -64,8 +65,9 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 		file_name[dir_entry->namelen] = '\0';
 		printf("%s\n",file_name);
 		if(!strcmp(file_name,just_filename)){
-			printf("file found");
+			printf("file found\n");
 			printf("Bytes done:%d Dir size:%d\n",bytes_done,dir_size);
+			memcpy(new_block,block,bytes_done);
 			break;
 			//remove it
 		}else{
