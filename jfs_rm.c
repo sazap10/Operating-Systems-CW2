@@ -44,13 +44,13 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	get_inode(jfs, file_inode, file_i_node);
 	
 	get_inode(jfs,dir_inode,dir_i_node);
-	dir_size = dir_i_node.size;
+	dir_size = dir_i_node->size;
 
 	printf("File to remove: %s\n", filename);
 	
 	jfs_read_block(jfs, block, inode_to_block(dir_inode));
 	
-	printf("inode to block: %d blockptr: %d\n",inode_to_block(dir_inode),dir_i_node.blockptrs[0]);
+	printf("inode to block: %d blockptr: %d\n",inode_to_block(dir_inode),dir_i_node->blockptrs[0]);
 	
 	dir_entry = (struct dirent*)block;
 	while(1){
@@ -64,7 +64,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 			memcpy(new_block,block,bytes_done);
 			int bytes_plus_entrylen= bytes_done+dir_entry->entry_len;
 			memcpy(new_block+bytes_done,block+bytes_plus_entrylen,dir_size-bytes_plus_entrylen);
-			dir_i_node.size -=dir_entry->entry_len;
+			dir_i_node->size -=dir_entry->entry_len;
 			/*jfs_write_block(jfs,new_block,dir_i_node.blockptrs[0]);
 			//set the inode as free	
 			return_inode_to_freelist(jfs,file_inode);
