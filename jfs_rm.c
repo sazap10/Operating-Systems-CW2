@@ -12,6 +12,35 @@ void usage()
     exit(1);
 }
 
+ 
+/* Change the size of the specified inode to a new size */
+void update_inode_size(jfs_t *jfs, int inode_num, unsigned int new_size)
+{
+    char block[BLOCKSIZE];
+    char updatedblock[BLOCKSIZE];
+    char *newblock;
+    struct inode *dir_inode;
+    int inodes_done = 0;
+    jfs_read_block(jfs,block,inode_to_block(inode_num));
+    while(1)
+    {
+        dir_inode = (struct inode *)(block + inodes_done*INODE_SIZE);
+        if(inode_num % INODES_PER_BLOCK == inodes_done)
+        {
+            dir_inode->size = new_size;
+        }
+        newblock = (char *)(updatedblock + inodes_done*INODE_SIZE);
+        inodes_done += 1;
+        memcpy(newblock,dir_inode,INODE_SIZE);
+        if(inodes_done == 8)
+        {
+            break;
+        }
+    }
+    jfs_write_block(jfs,updatedblock,inode_to_block(inode_num));
+    jfs_commit(jfs);
+}
+
 void jfs_remove_file(jfs_t *jfs,char *filename){
 	struct inode file_i_node, dir_i_node;
 	int root_inode,file_inode, dir_inode, dir_size, bytes_done=0;
@@ -71,6 +100,9 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 			memcpy(newblock,restofblock,(BLOCKSIZE - bytes_plus_entrylen));			
 			dir_i_node.size -=dir_entry->entry_len;
 			jfs_write_block(jfs,updatedblock,dir_i_node.blockptrs[0]);
+			jfs_commit(jfs);
+			unsigned int new_size = dir_size - dir_entry->entry_len;
+            update_inode_size(jfs, dir_inode, new_size);
 			//set the inode as free	
 			return_inode_to_freelist(jfs,file_inode);
 			int i =0;
@@ -80,7 +112,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 				return_block_to_freelist(jfs,file_i_node.blockptrs[i]);
 				i++;
 			}
-			jfs_commit(jfs);
+			
 			break;
 			//remove it
 		}else{
