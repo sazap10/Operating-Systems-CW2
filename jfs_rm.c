@@ -51,7 +51,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	jfs_read_block(jfs, block, inode_to_block(dir_inode));
 	
 	printf("inode to block: %d\n",inode_to_block(dir_inode));
-	dir_inode = (struct inode*)(block + dir_inode % INODES_PER_BLOCK) * INODE_SIZE);
+	dir_inode = (struct inode*)(block + (dir_inode % INODES_PER_BLOCK) * INODE_SIZE);
 	dir_entry = (struct dirent*)block;
 	/*while(1){
 		char file_name[MAX_FILENAME_LEN + 1];
