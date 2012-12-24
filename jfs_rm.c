@@ -41,7 +41,7 @@ void update_inode_size(jfs_t *jfs, int inode_num, unsigned int new_size)
             break;
         }
     }*/
-    jfs_write_block(jfs,updatedblock,inode_to_block(inode_num));
+    jfs_write_block(jfs,block,inode_to_block(inode_num));
     jfs_commit(jfs);
 }
 
