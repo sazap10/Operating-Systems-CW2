@@ -68,6 +68,8 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 			printf("file found\n");
 			printf("Bytes done:%d Dir size:%d\n",bytes_done,dir_size);
 			memcpy(new_block,block,bytes_done);
+			int bytes_plus_entrylen= bytes_done+dir_entry->entry_len;
+			memcpy(new_block,block+bytes_plus_entrylen,dir_size-bytes_plus_entrylen);
 			break;
 			//remove it
 		}else{
