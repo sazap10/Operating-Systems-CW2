@@ -13,7 +13,7 @@ void usage()
 }
 
  
-/* Change the size of the specified inode to a new size */
+/* Change the size of the dir to a new size */
 void change_dir_size(jfs_t *jfs, int dir_inode_num, unsigned int new_size)
 {
     char block[BLOCKSIZE];
@@ -87,20 +87,6 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 			}
 		}
 	}
-	
-	
-	/*used to loop through the blocks of the file
-	int i =0;
-	
-	while(i_node.blockptrs[i]){
-		//printf(", block%d = %d ",i,i_node.blockptrs[i]);
-		jfs_read_block(jfs,block,i_node.blockptrs[i]);
-		printf("%s",block);
-		//set block as free
-		//return_block_to_freelist(jfs,i_node.blockptrs[i]);
-		i++;
-	}*/
-	printf("\n");
 }
 
 int main(int argc, char **argv)
