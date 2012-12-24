@@ -22,6 +22,10 @@ void update_inode_size(jfs_t *jfs, int inode_num, unsigned int new_size)
     struct inode *dir_inode;
     int inodes_done = 0;
     jfs_read_block(jfs,block,inode_to_block(inode_num));
+	dir_inode = (struct inode *)(block + (inode_num % INODES_PER_BLOCK)*INODE_SIZE);
+    dir_inode->size = new_size;
+
+	/*
     while(1)
     {
         dir_inode = (struct inode *)(block + inodes_done*INODE_SIZE);
@@ -36,7 +40,7 @@ void update_inode_size(jfs_t *jfs, int inode_num, unsigned int new_size)
         {
             break;
         }
-    }
+    }*/
     jfs_write_block(jfs,updatedblock,inode_to_block(inode_num));
     jfs_commit(jfs);
 }
@@ -63,8 +67,6 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	
 	get_inode(jfs,dir_inode,&dir_i_node);
 	dir_size = dir_i_node.size;
-
-	printf("File to remove: %s\n", filename);
 	
 	jfs_read_block(jfs, block, dir_i_node.blockptrs[0]);
 	
@@ -76,7 +78,6 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 		if(!strcmp(file_name,just_filename)){
             char *beforefile;
             char *afterfile;
-			printf("file found\n");
 			memcpy(new_block,block,bytes_done);
 			beforefile = (char *)(new_block + bytes_done);
 			int bytes_plus_entrylen= bytes_done+dir_entry->entry_len;
