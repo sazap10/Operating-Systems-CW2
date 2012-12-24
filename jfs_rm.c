@@ -41,9 +41,9 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	dir_inode = findfile_recursive(jfs,rest,root_inode,DT_DIRECTORY);
 	printf("dir inode num: %d\n",dir_inode);
 	
-	get_inode(jfs, file_inode, file_i_node);
+	get_inode(jfs, file_inode, &file_i_node);
 	
-	get_inode(jfs,dir_inode,dir_i_node);
+	get_inode(jfs,dir_inode,&dir_i_node);
 	dir_size = dir_i_node.size;
 
 	printf("File to remove: %s\n", filename);
