@@ -13,7 +13,7 @@ void usage()
 }
 
 void jfs_remove_file(jfs_t *jfs,char *filename){
-	struct inode file_i_node, dir_i_node;
+	struct inode* file_i_node, dir_i_node;
 	int root_inode,file_inode, dir_inode, dir_size, bytes_done=0;
     struct dirent* dir_entry;
     char block[BLOCKSIZE],just_filename[MAX_FILENAME_LEN], rest[MAX_FILENAME_LEN], new_block[BLOCKSIZE];
@@ -41,14 +41,16 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	dir_inode = findfile_recursive(jfs,rest,root_inode,DT_DIRECTORY);
 	printf("dir inode num: %d\n",dir_inode);
 	
-	get_inode(jfs, file_inode, &file_i_node);
+	get_inode(jfs, file_inode, file_i_node);
 	
-	get_inode(jfs,dir_inode,&dir_i_node);
+	get_inode(jfs,dir_inode,dir_i_node);
 	dir_size = dir_i_node.size;
 
 	printf("File to remove: %s\n", filename);
 	
 	jfs_read_block(jfs, block, inode_to_block(dir_inode));
+	
+	printf("inode to block: %d blockptr: %d\n",inode_to_block(dir_inode),dir_i_node.blockptrs[0]);
 	
 	dir_entry = (struct dirent*)block;
 	while(1){
