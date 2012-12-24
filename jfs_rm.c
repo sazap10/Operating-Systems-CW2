@@ -13,7 +13,7 @@ void usage()
 }
 
 void jfs_remove_file(jfs_t *jfs,char *filename){
-	struct inode *file_i_node, *dir_i_node;
+	struct inode file_i_node, dir_i_node;
 	int root_inode,file_inode, dir_inode, dir_size, bytes_done=0;
     struct dirent* dir_entry;
     char block[BLOCKSIZE],just_filename[MAX_FILENAME_LEN], rest[MAX_FILENAME_LEN], new_block[BLOCKSIZE];
@@ -38,36 +38,7 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 		exit(1);
 	}
 	//printf("inode num: %d\n",inode);
-	dir_inode = findfile_recursive(jfs,rest,root_inode,DT_DIRECTORY);
-	printf("dir inode num: %d\n",dir_inode);
-	
-	//get_inode(jfs, file_inode, file_i_node);
-	
-	//get_inode(jfs,dir_inode,dir_i_node);
-	//dir_size = dir_i_node->size;
-
-	printf("File to remove: %s\n", filename);
-	
-	jfs_read_block(jfs, block, inode_to_block(dir_inode));
-	
-	printf("inode to block: %d\n",inode_to_block(dir_inode));
-	dir_inode = (struct inode*)(block + (dir_inode % INODES_PER_BLOCK) * INODE_SIZE);
-	dir_entry = (struct dirent*)block;
-	/*while(1){
-		char file_name[MAX_FILENAME_LEN + 1];
-		memcpy(file_name, dir_entry->name, dir_entry->namelen);
-		file_name[dir_entry->namelen] = '\0';
-		printf("%s\n",file_name);
-		if(!strcmp(file_name,just_filename)){
-			printf("file found\n");
-			printf("Bytes done:%d Dir size:%d\n",bytes_done,dir_size);
-			memcpy(new_block,block,bytes_done);
-			int bytes_plus_entrylen= bytes_done+dir_entry->entry_len;
-			memcpy(new_block+bytes_done,block+bytes_plus_entrylen,dir_size-bytes_plus_entrylen);
-			dir_i_node->size -=dir_entry->entry_len;
-			/*jfs_write_block(jfs,new_block,dir_i_node.blockptrs[0]);
-			//set the inode as free	
-			return_inode_to_freelist(jfs,file_inode);
+	return_inode_to_freelist(jfs,file_inode);
 			int i =0;
 	
 			while(file_i_node.blockptrs[i]){
@@ -75,8 +46,43 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 				return_block_to_freelist(jfs,file_i_node.blockptrs[i]);
 				i++;
 			}
+	
+	dir_inode = findfile_recursive(jfs,rest,root_inode,DT_DIRECTORY);
+	printf("dir inode num: %d\n",dir_inode);
+	
+	get_inode(jfs, file_inode, &file_i_node);
+	
+	get_inode(jfs,dir_inode,&dir_i_node);
+	dir_size = dir_i_node.size;
+
+	printf("File to remove: %s\n", filename);
+	
+	jfs_read_block(jfs, block, dir_i_node.blockptrs[0]);
+	
+	dir_entry = (struct dirent*)block;
+	while(1){
+		char file_name[MAX_FILENAME_LEN + 1];
+		memcpy(file_name, dir_entry->name, dir_entry->namelen);
+		file_name[dir_entry->namelen] = '\0';
+		printf("%s\n",file_name);
+		if(!strcmp(file_name,just_filename)){
+			char updatedblock[BLOCKSIZE];
+            char *newblock;
+            char *restofblock;
+			printf("file found\n");
+			printf("Bytes done:%d Dir size:%d\n",bytes_done,dir_size);
+			memcpy(updatedblock,block,bytes_done);
+			newblock = (char *)(updatedblock + bytes_done);
+			int bytes_plus_entrylen= bytes_done+dir_entry->entry_len;
+			restofblock = (char *)(block + bytes_plus_entrylen);
+			memcpy(newblock,restofblock,(BLOCKSIZE - bytes_plus_entrylen));			
+			dir_i_node.size -=dir_entry->entry_len;
+			jfs_write_block(jfs,updatedblock,dir_i_node.blockptrs[0]);
+			//set the inode as free	
+			
 			jfs_commit(jfs);
 			break;
+			//remove it
 		}else{
 			bytes_done += dir_entry->entry_len;
 			dir_entry = (struct dirent*)(block + bytes_done);
@@ -85,7 +91,21 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 				break;
 			}
 		}
+	}
+	
+	
+	/*used to loop through the blocks of the file
+	int i =0;
+	
+	while(i_node.blockptrs[i]){
+		//printf(", block%d = %d ",i,i_node.blockptrs[i]);
+		jfs_read_block(jfs,block,i_node.blockptrs[i]);
+		printf("%s",block);
+		//set block as free
+		//return_block_to_freelist(jfs,i_node.blockptrs[i]);
+		i++;
 	}*/
+	printf("\n");
 }
 
 int main(int argc, char **argv)
