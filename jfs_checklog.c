@@ -23,7 +23,7 @@ void checklog(jfs_t *jfs)
 		jfs_read_block(jfs,block,logfile_i_node.blockptrs[0]);
 		magicnum = (unsigned int*)block;
 		while(1){
-			if(*magicnum !=0x89abcdef){
+			if(*magicnum ==0x89abcdef){
 				printf("commit block found\n");
 				commitblock = (struct commit_block *)block;
 				break;
