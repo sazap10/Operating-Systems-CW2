@@ -11,6 +11,8 @@ void checklog(jfs_t *jfs)
 	struct inode logfile_i_node;
 	char block[BLOCKSIZE];
 	struct commit_block *commitblock;
+	unsigned int *magicnum;
+	int bytes_done =0;
 
     root_inode = find_root_directory(jfs);
     logfile_inode = findfile_recursive(jfs, ".log", root_inode, DT_FILE);
@@ -18,14 +20,17 @@ void checklog(jfs_t *jfs)
 		fprintf(stderr, "Missing logfile!\n");
     }else{
 		get_inode(jfs, logfile_inode, &logfile_i_node);
-		int i =0;
-		while(logfile_i_node.blockptrs[i]){
-			jfs_read_block(jfs,block,logfile_i_node.blockptrs[i]);
-			commitblock = (struct commit_block*) block;
+		jfs_read_block(jfs,block,logfile_i_node.blockptrs[0]);
+		magicnum = (unsigned int)block;
+		while(magicnum !=0x89abcdef){
+			magicnum = (unsigned int)(block + sizeof(unsigned int));
+			bytes_done+=sizeof(unsigned int);
 			//do stuff with block
 			//printf("%s",block);
+			if(bytes_done>=BLOCKSIZE)
+				break;
 		}
-		printf("\n");
+		printf("commit block found\n");
 	}
     
 }
