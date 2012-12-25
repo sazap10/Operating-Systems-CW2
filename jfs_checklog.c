@@ -20,7 +20,8 @@ void checklog(jfs_t *jfs)
 		int i =0;
 		while(logfile_i_node.blockptrs[i]){
 			jfs_read_block(jfs,block,logfile_i_node.blockptrs[i]);
-			printf("%s",block);
+			//do stuff with block
+			//printf("%s",block);
 		}
 		printf("\n");
 	}
