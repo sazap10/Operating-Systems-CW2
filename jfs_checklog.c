@@ -21,7 +21,7 @@ void checklog(jfs_t *jfs)
     }else{
 		get_inode(jfs, logfile_inode, &logfile_i_node);
 		jfs_read_block(jfs,block,logfile_i_node.blockptrs[0]);
-		magicnum = (unsigned int)block;
+		magicnum = (unsigned int*)block;
 		while(*magicnum !=0x89abcdef){
 			magicnum = (unsigned int*)(block + sizeof(unsigned int));
 			bytes_done+=sizeof(unsigned int);
