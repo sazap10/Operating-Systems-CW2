@@ -9,7 +9,7 @@ void checklog(jfs_t *jfs)
 {
     int root_inode,logfile_inode;
 	struct inode logfile_i_node;
-	char* block;
+	char* block=NULL;
 
     root_inode = find_root_directory(jfs);
     logfile_inode = findfile_recursive(jfs, ".log", root_inode, DT_FILE);
