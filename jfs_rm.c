@@ -29,20 +29,22 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
 	struct inode file_i_node, dir_i_node;
 	int root_inode,file_inode, dir_inode, dir_size, bytes_done=0;
     struct dirent* dir_entry;
-    char block[BLOCKSIZE],just_filename[MAX_FILENAME_LEN], rest[MAX_FILENAME_LEN], new_block[BLOCKSIZE];
+    char block[BLOCKSIZE],just_filename[MAX_FILENAME_LEN], dir_name[MAX_FILENAME_LEN], new_block[BLOCKSIZE];
 	
 	root_inode = find_root_directory(jfs);
 	
-	all_but_last_part(filename,rest);
+	all_but_last_part(filename,dir_name);
 	last_part(filename,just_filename);
 	file_inode = findfile_recursive(jfs, filename, root_inode,DT_FILE);
 	if(file_inode==-1){
 		printf("rm: cannot remove '%s': No such file\n",filename);
 		exit(1);
 	}
-	
-	dir_inode = findfile_recursive(jfs,rest,root_inode,DT_DIRECTORY);
-	
+	if (!strlen(dir_name)) {
+		dir_inode = root_inode;
+    }else{
+		dir_inode = findfile_recursive(jfs,dir_name,root_inode,DT_DIRECTORY);
+	}
 	get_inode(jfs, file_inode, &file_i_node);
 	
 	get_inode(jfs,dir_inode,&dir_i_node);
