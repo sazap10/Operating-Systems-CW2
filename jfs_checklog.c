@@ -25,6 +25,7 @@ void checklog(jfs_t *jfs)
 		while(1){
 			if(*magicnum !=0x89abcdef){
 				printf("commit block found\n");
+				commitblock = (commit_block *)block;
 				break;
 			}else{
 				magicnum = (unsigned int*)(block + sizeof(unsigned int));
