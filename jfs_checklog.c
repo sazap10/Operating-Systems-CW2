@@ -10,6 +10,7 @@ void checklog(jfs_t *jfs)
     int root_inode,logfile_inode;
 	struct inode logfile_i_node;
 	char block[BLOCKSIZE];
+	struct commit_block *commitblock;
 
     root_inode = find_root_directory(jfs);
     logfile_inode = findfile_recursive(jfs, ".log", root_inode, DT_FILE);
@@ -20,6 +21,7 @@ void checklog(jfs_t *jfs)
 		int i =0;
 		while(logfile_i_node.blockptrs[i]){
 			jfs_read_block(jfs,block,logfile_i_node.blockptrs[i]);
+			commitblock = (struct commit_block*) block;
 			//do stuff with block
 			//printf("%s",block);
 		}
