@@ -28,8 +28,8 @@ void checklog(jfs_t *jfs)
 				commitblock = (struct commit_block *)block;
 				break;
 			}else{
-				magicnum = (unsigned int*)(block + 1);
-				bytes_done++;
+				magicnum = (unsigned int*)(block + bytes_done);
+				bytes_done+=sizeof(unsigned int);
 				//do stuff with block
 				//printf("%s",block);
 				if(bytes_done>=BLOCKSIZE)
