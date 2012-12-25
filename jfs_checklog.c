@@ -22,15 +22,19 @@ void checklog(jfs_t *jfs)
 		get_inode(jfs, logfile_inode, &logfile_i_node);
 		jfs_read_block(jfs,block,logfile_i_node.blockptrs[0]);
 		magicnum = (unsigned int*)block;
-		while(*magicnum !=0x89abcdef){
-			magicnum = (unsigned int*)(block + sizeof(unsigned int));
-			bytes_done+=sizeof(unsigned int);
-			//do stuff with block
-			//printf("%s",block);
-			if(bytes_done>=BLOCKSIZE)
-				break;
+		while(1){
+			if(*magicnum !=0x89abcdef){
+				printf("commit block found\n");
+			}else{
+				magicnum = (unsigned int*)(block + sizeof(unsigned int));
+				bytes_done+=sizeof(unsigned int);
+				//do stuff with block
+				//printf("%s",block);
+				if(bytes_done>=BLOCKSIZE)
+					break;
+			}
 		}
-		printf("commit block found\n");
+		
 	}
     
 }
