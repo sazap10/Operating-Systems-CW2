@@ -1,162 +1,112 @@
-#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
- 
+
 #include "fs_disk.h"
 #include "jfs_common.h"
- 
-/* Change the size of the specified inode to a new size */
-void update_inode_size(jfs_t *jfs, int inode_num, unsigned int new_size)
-{
-    char block[BLOCKSIZE];
-    char updatedblock[BLOCKSIZE];
-    char *newblock;
-    struct inode *dir_inode;
-    int inodes_done = 0;
-    jfs_read_block(jfs,block,inode_to_block(inode_num));
-    while(1)
-    {
-        dir_inode = (struct inode *)(block + inodes_done*INODE_SIZE);
-        if(inode_num % INODES_PER_BLOCK == inodes_done)
-        {
-            dir_inode->size = new_size;
-        }
-        newblock = (char *)(updatedblock + inodes_done*INODE_SIZE);
-        inodes_done += 1;
-        memcpy(newblock,dir_inode,INODE_SIZE);
-        if(inodes_done == 8)
-        {
-            break;
-        }
-    }
-    jfs_write_block(jfs,updatedblock,inode_to_block(inode_num));
-    jfs_commit(jfs);
-}
- 
- 
-/* Rewrite the block with the dirent removed - ASSUMING FILE IS IN ROOT */
-void remove_dirent_recursive(jfs_t *jfs, char *pathname, int inode_num)
-{
-    int dir_size;
-    struct inode dir_inode;
-    struct dirent *dir_entry;
-    char block[BLOCKSIZE];
-    char target_dirent[(sizeof(struct dirent)+MAX_FILENAME_LEN)];
-     
-    /* Get inode of the directory and read directory into 'block' variable */
-    get_inode(jfs, inode_num, &dir_inode);
-    jfs_read_block(jfs, block, dir_inode.blockptrs[0]);
-    int bytes_done = 0;
- 
-    dir_size = dir_inode.size;
- 
-    /* dir_entry is a pointer to the dirent in the block */
-    dir_entry = (struct dirent*)block;
- 
-    /* target_dirent is the dirent name we want to find in this recursion */
-    first_part(pathname,target_dirent);
- 
-    while(1)
-    {
-        char filename[MAX_FILENAME_LEN + 1];
-        memcpy(filename, dir_entry->name, dir_entry->namelen);
-        filename[dir_entry->namelen] = '\0';
-        if(strcmp(filename,target_dirent)==0)
-        {
-            if(strcmp(pathname,target_dirent)==0)
-            {
-                /* We've found the dirent up for deletion */
-                /* Write a new block with the dirent not there. */
-                char updatedblock[BLOCKSIZE];
-                char *newblock;
-                char *restofblock;
-                memcpy(updatedblock,block,bytes_done);
-                newblock = (char *)(updatedblock + bytes_done);
-                restofblock = (char *)(block + (bytes_done + dir_entry->entry_len));
-                memcpy(newblock,restofblock,(BLOCKSIZE - bytes_done - dir_entry->entry_len));
-                jfs_write_block(jfs, updatedblock, dir_inode.blockptrs[0]);
-                jfs_commit(jfs);
-                /* Now all that's left is to edit the inode of the directory to update its size */
-                unsigned int new_size = dir_size - dir_entry->entry_len;
-                update_inode_size(jfs, inode_num, new_size);
-            }
-            else
-            {
-                /* There is more path to walk */
-                char *p;
-                p = strchr(pathname, '/');
-                p++;
-                remove_dirent_recursive(jfs,p,dir_entry->inode);
-                return;
-            }
-        }
-        bytes_done += dir_entry->entry_len;
-        dir_entry = (struct dirent*)(block + bytes_done);
- 
-        /* have we finished yet? */
-        if (bytes_done >= dir_size) {
-             break;
-        }
-    }
-}
- 
-void removefile(jfs_t *jfs, char *pathname)
-{
-    int root_inodenum, file_inodenum, counter;
-    struct inode file_inode;
- 
-    root_inodenum = find_root_directory(jfs);
- 
-    while(pathname[0]=='/') {
-        pathname++;
-    }
-    /* Get the inode number of the file */
-    file_inodenum = findfile_recursive(jfs, pathname, root_inodenum, DT_FILE);
-    /* Check if file exists */
-    if (file_inodenum < 0) {
-        fprintf(stderr, "Cannot find file %s\n", pathname);
-        exit(1);
-    }
-    /* Get the actual inode of the file */
-    get_inode(jfs, file_inodenum, &file_inode);
- 
-    /* For all the block pointers in the inode set them to unused */
-    for(counter = 0; counter < 14; counter++)
-    {
-        if(file_inode.blockptrs[counter] != NULL)
-        {
-            return_block_to_freelist(jfs,file_inode.blockptrs[counter]);
-        }
-    }
-    /* Set the inode to unused */
-    return_inode_to_freelist(jfs, file_inodenum);
- 
-    /* Get rid of the dirent of the file */
-    remove_dirent_recursive(jfs, pathname, root_inodenum);
-}
- 
- 
+
 void usage()
 {
-  fprintf(stderr,
-      "Usage: jfs_rm <volumename> <filename>\n");
-  exit(1);
+    fprintf(stderr, 
+	    "Usage: jfs_rm <volumename> <filename>\n");
+    exit(1);
 }
+
  
+/* Change the size of the dir to a new size */
+void change_dir_size(jfs_t *jfs, int dir_inode_num, unsigned int new_size)
+{
+    char block[BLOCKSIZE];
+    struct inode *dir_inode;
+    jfs_read_block(jfs,block,inode_to_block(dir_inode_num));
+	dir_inode = (struct inode *)(block + (dir_inode_num % INODES_PER_BLOCK)*INODE_SIZE);
+    dir_inode->size = new_size;
+    jfs_write_block(jfs,block,inode_to_block(dir_inode_num));
+    jfs_commit(jfs);
+}
+
+void jfs_remove_file(jfs_t *jfs,char *filename){
+	struct inode file_i_node, dir_i_node;
+	int root_inode,file_inode, dir_inode, dir_size, bytes_done=0;
+    struct dirent* dir_entry;
+    char block[BLOCKSIZE],just_filename[MAX_FILENAME_LEN], dir_name[MAX_FILENAME_LEN], new_block[BLOCKSIZE];
+	
+	root_inode = find_root_directory(jfs);
+	
+	all_but_last_part(filename,dir_name);
+	last_part(filename,just_filename);
+	file_inode = findfile_recursive(jfs, filename, root_inode,DT_FILE);
+	if(file_inode==-1){
+		printf("rm: cannot remove '%s': No such file\n",filename);
+		exit(1);
+	}
+	if (!strlen(dir_name)) {
+		dir_inode = root_inode;
+    }else{
+		dir_inode = findfile_recursive(jfs,dir_name,root_inode,DT_DIRECTORY);
+	}
+	get_inode(jfs, file_inode, &file_i_node);
+	
+	get_inode(jfs,dir_inode,&dir_i_node);
+	dir_size = dir_i_node.size;
+	
+	jfs_read_block(jfs, block, dir_i_node.blockptrs[0]);
+	
+	dir_entry = (struct dirent*)block;
+	while(1){
+		char file_name[MAX_FILENAME_LEN + 1];
+		memcpy(file_name, dir_entry->name, dir_entry->namelen);
+		file_name[dir_entry->namelen] = '\0';
+		if(!strcmp(file_name,just_filename)){
+            char *beforefile;
+            char *afterfile;
+			memcpy(new_block,block,bytes_done);
+			beforefile = (char *)(new_block + bytes_done);
+			int bytes_plus_entrylen= bytes_done+dir_entry->entry_len;
+			afterfile = (char *)(block + bytes_plus_entrylen);
+			memcpy(beforefile,afterfile,(BLOCKSIZE - bytes_plus_entrylen));			
+			jfs_write_block(jfs,new_block,dir_i_node.blockptrs[0]);
+			jfs_commit(jfs);
+            change_dir_size(jfs, dir_inode, dir_size - dir_entry->entry_len);
+			//set the inode as free	
+			return_inode_to_freelist(jfs,file_inode);
+			int i =0;
+	
+			while(file_i_node.blockptrs[i]){
+				//set block as free
+				return_block_to_freelist(jfs,file_i_node.blockptrs[i]);
+				i++;
+			}
+			
+			break;
+			//remove it
+		}else{
+			bytes_done += dir_entry->entry_len;
+			dir_entry = (struct dirent*)(block + bytes_done);
+
+			if (bytes_done >= dir_size) {
+				break;
+			}
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
-     struct disk_image *di;
-     jfs_t *jfs;
- 
-     if (argc != 3) {
-        usage();
-     }
- 
+    struct disk_image *di;
+    jfs_t *jfs;
+    
+    if (argc != 3) {
+		usage();
+    }
+
     di = mount_disk_image(argv[1]);
     jfs = init_jfs(di);
-     removefile(jfs, argv[2]);
+	
+	jfs_remove_file(jfs,argv[2]);
+	
     unmount_disk_image(di);
- 
+
     exit(0);
 }
+
