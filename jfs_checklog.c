@@ -21,15 +21,14 @@ void checklog(jfs_t *jfs)
     }else{
 		get_inode(jfs, logfile_inode, &logfile_i_node);
 		jfs_read_block(jfs,block,logfile_i_node.blockptrs[0]);
-		magicnum = (unsigned int*)block;
+		commitblock = (struct commit_block *)block;
 		while(1){
-			if(*magicnum ==0x89abcdef){
+			if(commitblock->magicnum ==0x89abcdef){
 				printf("commit block found\n");
-				commitblock = (struct commit_block *)block;
 				break;
 			}else{
-				magicnum = (unsigned int*)(block + bytes_done);
-				bytes_done++;
+				commitblock = commitblock + sizeof(struct commit_block);
+				bytes_done+=sizeof(struct commit_block);
 				//do stuff with block
 				//printf("%s",block);
 				if(bytes_done>=BLOCKSIZE)
