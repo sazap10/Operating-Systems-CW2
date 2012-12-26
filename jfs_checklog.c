@@ -27,7 +27,7 @@ void checklog(jfs_t *jfs)
 				printf("commit block found\n");
 				break;
 			}else{
-				commitblock = commitblock + sizeof(struct commit_block);
+				commitblock = (struct commit_block *)(block + bytes_done);
 				bytes_done+=sizeof(struct commit_block);
 				//do stuff with block
 				//printf("%s",block);
