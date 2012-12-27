@@ -20,7 +20,7 @@ void checklog(jfs_t *jfs)
 		fprintf(stderr, "Missing logfile!\n");
     }else{
 		get_inode(jfs, logfile_inode, &logfile_i_node);
-		jfs_read_block(jfs,block,logfile_i_node.blockptrs[0]);
+		jfs_read_block(jfs,block,logfile_i_node.blockptrs[1]);
 		commitblock = (struct commit_block *)block;
 		while(1){
 			if(commitblock->magicnum ==0x89abcdef){
