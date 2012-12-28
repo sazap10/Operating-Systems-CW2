@@ -25,6 +25,11 @@ void checklog(jfs_t *jfs)
 			if(commitblock->magicnum ==0x89abcdef){
 				printf("commit block found\n");
 				printf("Commited: %d\n",commitblock->uncommitted);
+				int j =0;
+				printf("Blocks:");
+				while(commitblock->blocknums[j])
+					printf(" %d",commitblock->blocknums[j]);
+				printf("\nsum: %d\n",commitblock->sum);
 				break;
 			}else{
 				commitblock = (struct commit_block *)(block + bytes_done);
