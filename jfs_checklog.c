@@ -9,7 +9,7 @@ void write_Data_To_Disk(jfs_t *jfs,int * blocks,struct inode logfile_i_node){
 	int i =0;
 	char writeBlock[BLOCKSIZE];
 	while(blocks[i]){
-		jfs_read_block(jfs,writeBlock,logfile_i_node->blockptrs[i]);
+		jfs_read_block(jfs,writeBlock,logfile_i_node.blockptrs[i]);
 		write_block(jfs->d_img,writeBlock,blocks[i]);
 		i++;
 	}
