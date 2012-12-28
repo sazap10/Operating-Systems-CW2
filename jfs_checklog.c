@@ -5,9 +5,18 @@
 #include "fs_disk.h"
 #include "jfs_common.h"
 
+void write_Data_To_Disk(jfs_t *jfs,int * blocks,struct inode logfile_i_node){
+	int i =0;
+	char writeBlock[BLOCKSIZE];
+	while(blocks[i]){
+		jfs_read_block(jfs,writeBlock,logfile_i_node->blockptrs[i]);
+		write_block(jfs->d_img,writeBlock,blocks[i]);
+		i++;
+	}
+}
+
 void checklog(jfs_t *jfs)
 {
-	struct cached_block *c_block;
     int root_inode,logfile_inode;
 	struct inode logfile_i_node;
 	char block[BLOCKSIZE];
@@ -25,13 +34,11 @@ void checklog(jfs_t *jfs)
 			commitblock = (struct commit_block *)block;
 			if(commitblock->magicnum ==0x89abcdef){
 				printf("commit block found\n");
-				printf("Commited: %d\n",commitblock->uncommitted);
-				int j =0;
-				printf("Blocks:");
-				while(commitblock->blocknums[j])
-					printf(" %d",commitblock->blocknums[j]);
-				printf("\nsum: %d\n",commitblock->sum);
-				c_block = jfs->cache_head;
+				if(commitblock->uncommitted){
+					write_Data_To_Disk(jfs,commitblock->blocknums,logfile_i_node);
+				}else{
+					printf("Already committed clearing logfile");
+				}
 				break;
 			}else{
 				commitblock = (struct commit_block *)(block + bytes_done);
