@@ -19,7 +19,7 @@ void checklog(jfs_t *jfs)
 {
     int root_inode,logfile_inode;
 	struct inode logfile_i_node;
-	char block[BLOCKSIZE],;
+	char block[BLOCKSIZE];
 	
 	struct commit_block *commitblock;
 	int bytes_done =0, i = 0;
