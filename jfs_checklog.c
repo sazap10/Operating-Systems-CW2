@@ -11,22 +11,20 @@ void checklog(jfs_t *jfs)
 	struct inode logfile_i_node;
 	char block[BLOCKSIZE];
 	struct commit_block *commitblock;
-	unsigned int *magicnum;
 	int bytes_done =0, i = 0;
 	
-
     root_inode = find_root_directory(jfs);
     logfile_inode = findfile_recursive(jfs, ".log", root_inode, DT_FILE);
     if (logfile_inode < 0) {
 		fprintf(stderr, "Missing logfile!\n");
     }else{
 		get_inode(jfs, logfile_inode, &logfile_i_node);
-		
 		while(logfile_i_node.blockptrs[i]){
 			jfs_read_block(jfs,block,logfile_i_node.blockptrs[i]);
 			commitblock = (struct commit_block *)block;
 			if(commitblock->magicnum ==0x89abcdef){
 				printf("commit block found\n");
+				printf("Commited: %d\n",commitblock->uncommitted);
 				break;
 			}else{
 				commitblock = (struct commit_block *)(block + bytes_done);
