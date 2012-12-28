@@ -37,6 +37,7 @@ void checklog(jfs_t *jfs)
 				if(bytes_done>=BLOCKSIZE)
 					break;
 			}
+			bytes_done = 0;
 			i++;
 		}
 		
