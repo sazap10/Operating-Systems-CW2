@@ -7,6 +7,7 @@
 
 void checklog(jfs_t *jfs)
 {
+	struct cached_block *c_block;
     int root_inode,logfile_inode;
 	struct inode logfile_i_node;
 	char block[BLOCKSIZE];
@@ -30,6 +31,7 @@ void checklog(jfs_t *jfs)
 				while(commitblock->blocknums[j])
 					printf(" %d",commitblock->blocknums[j]);
 				printf("\nsum: %d\n",commitblock->sum);
+				c_block = jfs->cache_head;
 				break;
 			}else{
 				commitblock = (struct commit_block *)(block + bytes_done);
