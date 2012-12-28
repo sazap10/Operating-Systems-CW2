@@ -29,7 +29,7 @@ void checklog(jfs_t *jfs)
 			}else{
 				commitblock = (struct commit_block *)(block + bytes_done);
 				bytes_done+=sizeof(struct commit_block);
-				printf("%x\n",commitblock->magicnum);
+				//printf("%x\n",commitblock->magicnum);
 				//do stuff with block
 				//printf("%s",block);
 				if(bytes_done>=BLOCKSIZE)
