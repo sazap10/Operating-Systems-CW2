@@ -5,7 +5,7 @@
 #include "fs_disk.h"
 #include "jfs_common.h"
 
-void checklog(jfs_t *jfs)
+void checklog(jfs_t *jfs,int i)
 {
     int root_inode,logfile_inode;
 	struct inode logfile_i_node;
@@ -20,7 +20,7 @@ void checklog(jfs_t *jfs)
 		fprintf(stderr, "Missing logfile!\n");
     }else{
 		get_inode(jfs, logfile_inode, &logfile_i_node);
-		jfs_read_block(jfs,block,logfile_i_node.blockptrs[1]);
+		jfs_read_block(jfs,block,logfile_i_node.blockptrs[i]);
 		commitblock = (struct commit_block *)block;
 		while(1){
 			if(commitblock->magicnum ==0x89abcdef){
@@ -52,15 +52,16 @@ int main(int argc, char **argv)
 {
     struct disk_image *di;
     jfs_t *jfs;
-
-    if (argc != 2) {
+	int i;
+	i = atoi(argv[2]);
+    if (argc != 3) {
 	usage();
     }
 
     di = mount_disk_image(argv[1]);
     jfs = init_jfs(di);
 
-    checklog(jfs);
+    checklog(jfs,i);
 
     unmount_disk_image(di);
 
