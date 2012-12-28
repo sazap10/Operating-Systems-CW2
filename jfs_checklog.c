@@ -5,14 +5,15 @@
 #include "fs_disk.h"
 #include "jfs_common.h"
 
-void checklog(jfs_t *jfs,int i)
+void checklog(jfs_t *jfs)
 {
     int root_inode,logfile_inode;
 	struct inode logfile_i_node;
 	char block[BLOCKSIZE];
 	struct commit_block *commitblock;
 	unsigned int *magicnum;
-	int bytes_done =0;
+	int bytes_done =0, i = 0;
+	
 
     root_inode = find_root_directory(jfs);
     logfile_inode = findfile_recursive(jfs, ".log", root_inode, DT_FILE);
@@ -20,9 +21,10 @@ void checklog(jfs_t *jfs,int i)
 		fprintf(stderr, "Missing logfile!\n");
     }else{
 		get_inode(jfs, logfile_inode, &logfile_i_node);
-		jfs_read_block(jfs,block,logfile_i_node.blockptrs[i]);
-		commitblock = (struct commit_block *)block;
-		while(1){
+		
+		while(logfile_i_node.blockptrs[i]){
+			jfs_read_block(jfs,block,logfile_i_node.blockptrs[i]);
+			commitblock = (struct commit_block *)block;
 			if(commitblock->magicnum ==0x89abcdef){
 				printf("commit block found\n");
 				break;
@@ -35,6 +37,7 @@ void checklog(jfs_t *jfs,int i)
 				if(bytes_done>=BLOCKSIZE)
 					break;
 			}
+			i++;
 		}
 		
 	}
@@ -52,16 +55,15 @@ int main(int argc, char **argv)
 {
     struct disk_image *di;
     jfs_t *jfs;
-	int i;
-	i = atoi(argv[2]);
-    if (argc != 3) {
+
+    if (argc != 2) {
 	usage();
     }
 
     di = mount_disk_image(argv[1]);
     jfs = init_jfs(di);
 
-    checklog(jfs,i);
+    checklog(jfs);
 
     unmount_disk_image(di);
 
