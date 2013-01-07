@@ -11,8 +11,11 @@
 void write_Data_To_Disk(jfs_t *jfs,int * blocks,struct inode logfile_i_node){
 	int i =0;
 	char writeBlock[BLOCKSIZE];
+	//loop through the blocks in the log file
 	while(blocks[i]!=-1 && i<INODE_BLOCK_PTRS){
+		//reads the block in the log file
 		jfs_read_block(jfs,writeBlock,logfile_i_node.blockptrs[i]);
+		//writes to the diskk using the blocknumber present in the logfile commit block
 		write_block(jfs->d_img,writeBlock,blocks[i]);
 		i++;
 	}
