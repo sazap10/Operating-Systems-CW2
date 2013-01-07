@@ -5,6 +5,9 @@
 #include "fs_disk.h"
 #include "jfs_common.h"
 
+/* The following method takes the data present in the log file 
+	writes them to the correct location in the disk
+*/
 void write_Data_To_Disk(jfs_t *jfs,int * blocks,struct inode logfile_i_node){
 	int i =0;
 	char writeBlock[BLOCKSIZE];
