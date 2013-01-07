@@ -20,9 +20,8 @@ void checklog(jfs_t *jfs)
     int root_inode,logfile_inode;
 	struct inode logfile_i_node;
 	char block[BLOCKSIZE];
-	
 	struct commit_block *commitblock;
-	int bytes_done =0, i = 0;
+	int i = 0;
 	
     root_inode = find_root_directory(jfs);
     logfile_inode = findfile_recursive(jfs, ".log", root_inode, DT_FILE);
@@ -37,17 +36,10 @@ void checklog(jfs_t *jfs)
 				//printf("commit block found\n");
 				if(commitblock->uncommitted){
 					write_Data_To_Disk(jfs,commitblock->blocknums,logfile_i_node);
-				}else{
-					printf("Already committed clearing logfile");
 				}
+				memset(block,0,BLOCKSIZE);
 				break;
-			}// }else{
-				// commitblock = (struct commit_block *)(block + bytes_done);
-				// bytes_done+=sizeof(struct commit_block);
-				// if(bytes_done>=BLOCKSIZE)
-					// break;
-			// }
-			// bytes_done = 0;
+			}
 			i++;
 		}
 		
