@@ -42,7 +42,7 @@ void checklog(jfs_t *jfs)
 		//loop through the block pointer in the inode
 		while(logfile_i_node.blockptrs[i]){
 			//add the block number to the checksum
-			checksum+=blockptrs[i];
+			checksum+=logfile_i_node.blockptrs[i];
 			//read in the block using the number from the block pointers array
 			jfs_read_block(jfs,block,logfile_i_node.blockptrs[i]);
 			//cast this block into a commit block
