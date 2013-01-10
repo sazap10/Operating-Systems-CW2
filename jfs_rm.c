@@ -36,6 +36,9 @@ void jfs_remove_file(jfs_t *jfs,char *filename){
     struct dirent* dir_entry;
     char block[BLOCKSIZE],just_filename[MAX_FILENAME_LEN], dir_name[MAX_FILENAME_LEN], new_block[BLOCKSIZE];
 	//find inode number of the root directory to search for the directory and file
+	while(filename[0]=='/') {
+		filename++;
+    }
 	root_inode = find_root_directory(jfs);
 	//get the path of the directory in which the file is located
 	all_but_last_part(filename,dir_name);
