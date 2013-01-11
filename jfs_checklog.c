@@ -52,6 +52,15 @@ void checklog(jfs_t *jfs){
 				if(commitblock->uncommitted){
 					write_Data_To_Disk(jfs,commitblock->blocknums,logfile_i_node);
 				}
+				
+				if (i < INODE_BLOCK_PTRS) {
+					int j;
+					for (j = 0; j < INODE_BLOCK_PTRS; j++)
+						commitblock->blocknums[j] = -1;
+					commitblock->sum = 0;
+					commitblock->uncommitted = 0;
+					write_block(jfs->d_img, block, logfile_i_node.blockptrs[i]);
+				}
 				break;
 			}
 			i++;
